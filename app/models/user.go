@@ -2,7 +2,6 @@ package models
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 	"go-revel-blog/app/db"
 )
@@ -36,11 +35,8 @@ func (u *User) GetByID(
 	db db.SQLOperations,
 	id int64,
 ) (*User, error) {
-	var user User
 	row := db.QueryRowContext(ctx, getUserByID, id)
-
-	err := u.scanRowIntoUser(row, &user)
-	return &user, err
+	return u.scan(row)
 }
 
 func (u *User) GetByUsername(
@@ -48,11 +44,8 @@ func (u *User) GetByUsername(
 	db db.SQLOperations,
 	username string,
 ) (*User, error) {
-	var user User
 	row := db.QueryRowContext(ctx, getUserByUsername, username)
-
-	err := u.scanRowIntoUser(row, &user)
-	return &user, err
+	return u.scan(row)
 }
 
 func (u *User) Save(
@@ -88,11 +81,11 @@ func (u *User) Save(
 	return err
 }
 
-func (q *User) scanRowIntoUser(
-	row *sql.Row,
-	user *User,
-) error {
-	return row.Scan(
+func (u *User) scan(
+	row db.RowScanner,
+) (*User, error) {
+	var user User
+	err := row.Scan(
 		&user.ID,
 		&user.Username,
 		&user.FirstName,
@@ -102,4 +95,5 @@ func (q *User) scanRowIntoUser(
 		&user.CreatedAt,
 		&user.UpdatedAt,
 	)
+	return &user, err
 }
