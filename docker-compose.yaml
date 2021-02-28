@@ -1,0 +1,25 @@
+version: '3'
+
+services:
+  go-revel-blog:
+    build:
+      context: .
+      dockerfile: ./Dockerfile.local
+    ports:
+      - 7000:7000
+    volumes:
+      - .:/go-revel-blog
+    environment:
+      - ENV=dev
+      - DB_URL=postgres://go-revel-blog:go-revel-blog@postgres/go-revel-blog?sslmode=disable
+
+  postgres:
+    image: postgres:13.2-alpine
+    ports:
+      - 5432:5432
+    volumes:
+      - ~/apps/go-revel-blog/pgdata:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=go-revel-blog
+      - POSTGRES_USER=go-revel-blog
+      - POSTGRES_DB=go-revel-blog
