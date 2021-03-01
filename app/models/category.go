@@ -72,12 +72,12 @@ func (c *Category) All(
 	return cats, err
 }
 
-func (q *Category) Count(
+func (c *Category) Count(
 	ctx context.Context,
 	db db.SQLOperations,
 	filter *Filter,
 ) (int, error) {
-	query, args := q.buildQuery(
+	query, args := c.buildQuery(
 		countCategorySQL,
 		&Filter{
 			Term: filter.Term,
@@ -144,18 +144,18 @@ func (c *Category) Save(
 	return err
 }
 
-func (c *Category) scan(
+func (*Category) scan(
 	row db.RowScanner,
 ) (*Category, error) {
-	var category Category
+	var c Category
 	err := row.Scan(
-		&category.ID,
-		&category.Name,
-		&category.Description,
-		&category.CreatedAt,
-		&category.UpdatedAt,
+		&c.ID,
+		&c.Name,
+		&c.Description,
+		&c.CreatedAt,
+		&c.UpdatedAt,
 	)
-	return &category, err
+	return &c, err
 }
 
 func (c *Category) buildQuery(
