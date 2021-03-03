@@ -15,6 +15,17 @@ POST        /register                                   Users.Save
 GET         /login                                      Users.Login
 POST        /login                                      Users.DoLogin
 GET         /logout                                     Users.Logout
+GET         /user/:id                                   Users.Get
+
+GET         /post/:id                                   Posts.Get
+
+GET         /categories                                 Categories.All
+GET         /category/new                               Categories.Create
+POST        /category/new                               Categories.Save
+GET         /category/:id                               Categories.Get
+GET         /category/edit/:id                          Categories.Edit
+POST        /category/edit/:id                          Categories.Update
+GET         /category/delete/:id                        Categories.Delete
 
 # Ignore favicon requests
 GET     /favicon.ico                            404

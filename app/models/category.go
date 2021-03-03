@@ -9,9 +9,9 @@ import (
 )
 
 const (
-	createCategorySQL = `insert into categories (user_id, name, description created_at) values ($1, $2, $3, $4) returning id`
-	getCategorySQL    = `select id, user_id, name, description created_at, updated_at from users`
-	getCategoryByID   = getUsersSQL + ` where id=$1`
+	createCategorySQL = `insert into categories (user_id, name, description, created_at) values ($1, $2, $3, $4) returning id`
+	getCategorySQL    = `select id, user_id, name, description, created_at, updated_at from categories`
+	getCategoryByID   = getCategorySQL + ` where id=$1`
 	updateCategorySQL = `update categories set (name, description, updated_at) = ($1, $2, $3) where id = $4`
 	countCategorySQL  = `select count(id) from categories`
 	deleteCategorySQL = `delete from categories where id=$1`
@@ -20,16 +20,16 @@ const (
 type (
 	Category struct {
 		SequentialIdentifier
-		UserID      string `json:"user_id"`
+		UserID      int64  `json:"user_id"`
 		Name        string `json:"name"`
 		Description string `json:"description"`
 		Timestamps
 	}
 )
 
-func (category *Category) String() string {
-	return fmt.Sprintf("Category(%s)", category.Name)
-}
+// func (category *Category) String() string {
+// 	return fmt.Sprintf("Category(%s)", category.Name)
+// }
 
 func (c *Category) All(
 	ctx context.Context,
@@ -111,7 +111,7 @@ func (c *Category) GetByID(
 	db db.SQLOperations,
 	id int64,
 ) (*Category, error) {
-	row := db.QueryRowContext(ctx, getUserByID, id)
+	row := db.QueryRowContext(ctx, getCategoryByID, id)
 	return c.scan(row)
 }
 
@@ -150,6 +150,7 @@ func (*Category) scan(
 	var c Category
 	err := row.Scan(
 		&c.ID,
+		&c.UserID,
 		&c.Name,
 		&c.Description,
 		&c.CreatedAt,

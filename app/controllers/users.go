@@ -5,6 +5,7 @@ import (
 	"go-revel-blog/app/forms"
 	"go-revel-blog/app/models"
 	"go-revel-blog/app/routes"
+	"net/http"
 
 	"github.com/revel/revel"
 	"golang.org/x/crypto/bcrypt"
@@ -12,23 +13,6 @@ import (
 
 type Users struct {
 	App
-}
-
-func (c Users) getUser(username string) *models.User {
-	user := &models.User{}
-	_, err := c.Session.GetInto("user", user, false)
-	if user.Username == username {
-		return user
-	}
-
-	newUser := models.User{}
-	foundUser, err := newUser.GetByUsername(c.Request.Context(), db.DB(), username)
-	if err != nil {
-		return nil
-	}
-
-	c.Session["user"] = foundUser
-	return foundUser
 }
 
 func (c Users) Register() revel.Result {
@@ -121,4 +105,23 @@ func (c Users) Logout() revel.Result {
 		delete(c.Session, k)
 	}
 	return c.Redirect(routes.Posts.All())
+}
+
+func (c *Users) Get(id int64) revel.Result {
+	newUser := models.User{}
+	user, err := newUser.GetByID(c.Request.Context(), db.DB(), id)
+	if err != nil {
+		if err.Error() == "record not found" {
+			result := response(err.Error(), "data not found", "fail")
+			c.Response.SetStatus(http.StatusNotFound)
+			return c.Render(result)
+		}
+		result := response(err.Error(), "error get user", "failed")
+		c.Response.SetStatus(http.StatusInternalServerError)
+		return c.Render(result)
+	}
+
+	c.Response.SetStatus(http.StatusFound)
+	result := response(user, "get user successfull", "success")
+	return c.Render(result)
 }

@@ -1,0 +1,53 @@
+{{set . "title" "Citiquote - Quote list"}}
+{{template "header.html" .}}
+
+  <div class="py-5 px-3">
+    <h1>Category List</h1>
+    <p>Add category <a href="{{url "Categories.Create" }}">here</a></p>
+    <div class="cats">
+      {{if .result.Data.Categories}}
+      {{ template "paginate.html" .result.Data.Pagination}}
+      <table class="table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>User</th>
+            <th>Name</th>
+            <th>Description</th>
+            <th>CreatedAt</th>
+            <th>UpdatedAt</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {{range .result.Data.Categories}}
+          <tr>
+            <td>{{.ID}}</td>
+            <td>{{.UserID}}</td>
+            <td>{{.Name}}</td>
+            <td>{{.Description}}</td>
+            <td>{{.CreatedAt}}</td>
+            <td>
+              {{if .UpdatedAt.Valid}}
+                {{.UpdatedAt.Value}}
+              {{else}}
+                -
+              {{end}}
+            </td>
+            <td>
+              <a href="{{url "Categories.Get" .ID}}">View</a> |
+              <a href="{{url "Categories.Edit" .ID}}">Edit</a> |
+              <a href="{{url "Categories.Delete" .ID}}" onclick="return confirm('Are you sure?')">Delete</a>
+            </td>
+          </tr>
+          {{end}}
+        </tbody>
+      </table>
+    {{else}}
+    <p>
+      No Categories
+    </p>
+    {{end}}
+  </div>
+
+{{template "footer.html" .}}

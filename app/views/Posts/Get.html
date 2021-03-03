@@ -1,4 +1,4 @@
-{{set . "title" "Go-Revel-Blog:: Post list"}}
+{{set . "title" "Go-Revel-Blog Post list"}}
 {{template "header.html" .}}
 
 <div class="row">
@@ -6,21 +6,14 @@
       <h3 class="pb-4 mb-4 fst-italic border-bottom">
         Best blog around
       </h3>
-      {{if .result.Data.Posts}}
-        {{ template "paginate.html" .result.Data.Pagination}}
-        {{range .result.Data.Posts}}
-          <article class="blog-post">
-            <h2 class="blog-post-title">{{.Title}}</h2>
-            <p class="blog-post-meta">Added on {{.CreatedAt}} by {{.UserID}} in {{.CategoryID}}</p>
-            <div class="blog-preview">{{raw .Preview}}</div>
-            <p class="more"><a href="{{url "Posts.Get" .ID}}">Read More</a></p>
-          </article>
-        {{end}}
+      {{if .result.Data}}
+        <article class="blog-post">
+          <h2 class="blog-post-title">{{.Title}}</h2>
+          <p class="blog-post-meta">Added on {{.CreatedAt}} by {{.UserID}} in {{.CategoryID}}</p>
+          <div class="blog">{{.Content}}</div>
+        </article>
       {{else}}
-        <p>No post ever!</p>
-        {{if not .user}}
-          <p><a href="{{url "Users.Login"}}">Login</a> or <a href="{{url "Users.Register"}}">Register</a> to add post.</p>
-        {{end}}
+        <p>This post couldn't be fetched!</p>
       {{end}}
     </div>
     <div class="col-md-4">

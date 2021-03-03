@@ -15,16 +15,23 @@
   </head>
   <body>
     <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top navbar-static-top">
-      <div class="container-fluid">
-        <a class="navbar-brand" href="/">Komsner</a>
+      <div class="container">
+        <a class="navbar-brand" href="{{url "Posts.All"}}">Home</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
 
         <div class="collapse navbar-collapse" id="navbarCollapse">
           <ul class="navbar-nav mr-auto">
-            <li class="nav-item">
-              <a class="nav-link active" href="#">Messages</span></a>
+
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="categories" data-bs-toggle="dropdown" aria-expanded="false">Categories</a>
+              <ul class="dropdown-menu" aria-labelledby="categories">
+                <li><a class="dropdown-item" href="{{url "Categories.All"}}">List</a></li>
+                {{if .user}}
+                <li><a class="dropdown-item" href="{{url "Categories.Create"}}">Add</a></li>
+                {{end}}
+              </ul>
             </li>
 
             {{if .user}}
@@ -34,11 +41,11 @@
               <li class="nav-item">
                 <a class="nav-link" href="{{url "Users.Logout"}}">Logout</a>
               </li>
+            {{else}}
+              <li class="nav-item">
+                <a class="nav-link" href="{{url "Users.Login"}}">Login</a>
+              </li>
             {{end}}
-
-            <li class="nav-item">
-              <a class="nav-link" href="{{url "Users.Login"}}">Login</a>
-            </li>
 
           </ul>
           <form class="form-inline mt-2 mt-md-0">

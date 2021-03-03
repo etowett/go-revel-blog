@@ -2,7 +2,6 @@ package models
 
 import (
 	"context"
-	"fmt"
 	"go-revel-blog/app/db"
 )
 
@@ -26,9 +25,9 @@ type (
 	}
 )
 
-func (u *User) String() string {
-	return fmt.Sprintf("User(%s)", u.Username)
-}
+// func (u *User) String() string {
+// 	return fmt.Sprintf("User(%s)", u.Username)
+// }
 
 func (u *User) GetByID(
 	ctx context.Context,

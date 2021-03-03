@@ -1,0 +1,24 @@
+{{set . "title" "Go-Revel-Blog - Category details"}}
+{{template "header.html" .}}
+
+  <div class="py-5 px-3">
+    <h1>Category Details</h1>
+    <p>Add Category <a href="{{url "Categories.Create" }}">here</a></p>
+    <div class="category">
+      {{with .result.Data}}
+        <p>Name: {{.Name}}</p>
+        <p>Description: {{.Description}}</p>
+        <p>Added on: {{.CreatedAt}}</p>
+        {{if .UpdatedAt.Valid}}
+        <p>UpdatedAt: {{.UpdatedAt.Value}}</p>
+        {{end}}
+        <p>
+          <a href="{{url "Categories.Edit" .ID}}">Edit</a> |
+          <a href="{{url "Categories.Delete" .ID}}" onclick="return confirm('Are you sure?')">Delete</a>
+        </p>
+      {{end}}
+    </div>
+
+  </div>
+
+{{template "footer.html" .}}

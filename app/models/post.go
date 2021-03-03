@@ -9,10 +9,10 @@ import (
 )
 
 const (
-	createPostSQL = `insert into posts (user_id, Post_id, title, content, created_at) values ($1, $2, $3, $4, $5) returning id`
-	getPostSQL    = `select id, user_id, Post_id, title, content, created_at, updated_at from posts`
+	createPostSQL = `insert into posts (user_id, category_id, title, content, created_at) values ($1, $2, $3, $4, $5) returning id`
+	getPostSQL    = `select id, user_id, category_id, title, content, created_at, updated_at from posts`
 	getPostByID   = getUsersSQL + ` where id=$1`
-	updatePostSQL = `update posts set (Post_id, title, content, updated_at) = ($1, $2, $3, &4) where id = $5`
+	updatePostSQL = `update posts set (category_id, title, content, updated_at) = ($1, $2, $3, &4) where id = $5`
 	countPostSQL  = `select count(id) from posts`
 	deletePostSQL = `delete from posts where id=$1`
 )
