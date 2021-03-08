@@ -22,4 +22,8 @@ func response(data interface{}, message string, status string) Response {
 
 func init() {
 	revel.InterceptMethod(App.AddUser, revel.BEFORE)
+
+	revel.TemplateFuncs["preview"] = func(body string, num int) string {
+		return body[0:num]
+	}
 }

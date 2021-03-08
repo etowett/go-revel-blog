@@ -3,6 +3,7 @@ package controllers
 import (
 	"go-revel-blog/app/db"
 	"go-revel-blog/app/models"
+	"time"
 
 	"github.com/revel/revel"
 )
@@ -13,8 +14,9 @@ type App struct {
 
 func (c App) Health() revel.Result {
 	return c.RenderJSON(map[string]interface{}{
-		"success": true,
-		"status":  "Ok",
+		"success":     true,
+		"message":     "Ok",
+		"server_time": time.Now().String(),
 	})
 }
 

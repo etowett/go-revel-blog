@@ -17,15 +17,12 @@ POST        /login                                      Users.DoLogin
 GET         /logout                                     Users.Logout
 GET         /user/:id                                   Users.Get
 
+GET         /post/new                                   Posts.New
+POST        /post/new                                   Posts.Save
 GET         /post/:id                                   Posts.Get
-
-GET         /categories                                 Categories.All
-GET         /category/new                               Categories.Create
-POST        /category/new                               Categories.Save
-GET         /category/:id                               Categories.Get
-GET         /category/edit/:id                          Categories.Edit
-POST        /category/edit/:id                          Categories.Update
-GET         /category/delete/:id                        Categories.Delete
+GET         /post/edit/:id                              Posts.Edit
+POST        /post/edit/:id                              Posts.Update
+GET         /post/delete/:id                            Posts.Delete
 
 # Ignore favicon requests
 GET     /favicon.ico                            404

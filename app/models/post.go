@@ -6,13 +6,15 @@ import (
 	"go-revel-blog/app/db"
 	"go-revel-blog/app/helpers"
 	"strings"
+
+	"github.com/revel/revel"
 )
 
 const (
-	createPostSQL = `insert into posts (user_id, category_id, title, content, created_at) values ($1, $2, $3, $4, $5) returning id`
-	getPostSQL    = `select id, user_id, category_id, title, content, created_at, updated_at from posts`
-	getPostByID   = getUsersSQL + ` where id=$1`
-	updatePostSQL = `update posts set (category_id, title, content, updated_at) = ($1, $2, $3, &4) where id = $5`
+	createPostSQL = `insert into posts (user_id, title, content, tag, created_at) values ($1, $2, $3, $4, $5) returning id`
+	getPostSQL    = `select id, user_id, title, content, tag, created_at, updated_at from posts`
+	getPostByID   = getPostSQL + ` where id=$1`
+	updatePostSQL = `update posts set (title, content, tag, updated_at) = ($1, $2, $3, &4) where id = $5`
 	countPostSQL  = `select count(id) from posts`
 	deletePostSQL = `delete from posts where id=$1`
 )
@@ -20,17 +22,13 @@ const (
 type (
 	Post struct {
 		SequentialIdentifier
-		UserID     string `json:"username"`
-		CategoryID string `json:"first_name"`
-		Title      string `json:"last_name"`
-		Content    string `json:"email"`
+		UserID  int64  `json:"user_id"`
+		Title   string `json:"title"`
+		Content string `json:"content"`
+		Tag     string `json:"tag"`
 		Timestamps
 	}
 )
-
-func (p *Post) String() string {
-	return fmt.Sprintf("Post(%s)", p.Title)
-}
 
 func (p *Post) All(
 	ctx context.Context,
@@ -59,9 +57,9 @@ func (p *Post) All(
 		err = rows.Scan(
 			&post.ID,
 			&post.UserID,
-			&post.CategoryID,
 			&post.Title,
 			&post.Content,
+			&post.Tag,
 			&post.CreatedAt,
 			&post.UpdatedAt,
 		)
@@ -108,12 +106,12 @@ func (p *Post) Delete(
 	return rowsDeleted, nil
 }
 
-func (p *Post) GetByID(
+func (p *Post) ByID(
 	ctx context.Context,
 	db db.SQLOperations,
 	id int64,
 ) (*Post, error) {
-	row := db.QueryRowContext(ctx, getUserByID, id)
+	row := db.QueryRowContext(ctx, getPostByID, id)
 	return p.scan(row)
 }
 
@@ -129,19 +127,21 @@ func (p *Post) Save(
 			ctx,
 			createPostSQL,
 			p.UserID,
-			p.CategoryID,
 			p.Title,
 			p.Content,
+			p.Tag,
 			p.Timestamps.CreatedAt,
 		).Scan(&p.ID)
 		return err
 	}
+	revel.AppLog.Errorf("updatePostSQL: %v", updatePostSQL)
+	revel.AppLog.Errorf("post: %+v", p)
 	_, err = db.ExecContext(
 		ctx,
 		updatePostSQL,
-		p.CategoryID,
 		p.Title,
 		p.Content,
+		p.Tag,
 		p.Timestamps.UpdatedAt,
 		p.ID,
 	)
@@ -155,9 +155,9 @@ func (*Post) scan(
 	err := row.Scan(
 		&p.ID,
 		&p.UserID,
-		&p.CategoryID,
 		&p.Title,
 		&p.Content,
+		&p.Tag,
 		&p.CreatedAt,
 		&p.UpdatedAt,
 	)

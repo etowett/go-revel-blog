@@ -24,17 +24,11 @@
         <div class="collapse navbar-collapse" id="navbarCollapse">
           <ul class="navbar-nav mr-auto">
 
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="categories" data-bs-toggle="dropdown" aria-expanded="false">Categories</a>
-              <ul class="dropdown-menu" aria-labelledby="categories">
-                <li><a class="dropdown-item" href="{{url "Categories.All"}}">List</a></li>
-                {{if .user}}
-                <li><a class="dropdown-item" href="{{url "Categories.Create"}}">Add</a></li>
-                {{end}}
-              </ul>
-            </li>
-
             {{if .user}}
+              <li class="nav-item">
+                <a href="{{url "Posts.New"}}" class="nav-link">New Article</a>
+              </li>
+
               <li class="nav-item">
                 <a href="{{url "Users.Get" .user.ID}}" class="nav-link">Connected as {{.user.Username}}</a>
               </li>

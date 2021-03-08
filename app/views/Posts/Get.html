@@ -6,12 +6,25 @@
       <h3 class="pb-4 mb-4 fst-italic border-bottom">
         Best blog around
       </h3>
-      {{if .result.Data}}
+      {{if not .result.Success}}
+      <div class="alert alert-danger alert-dismissible fade show">
+        <strong>Failed!</strong> {{.result.Message}}
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+      </div>
+      {{end}}
+      {{if .result.Data.Post}}
+        {{with .result.Data.Post}}
         <article class="blog-post">
           <h2 class="blog-post-title">{{.Title}}</h2>
-          <p class="blog-post-meta">Added on {{.CreatedAt}} by {{.UserID}} in {{.CategoryID}}</p>
-          <div class="blog">{{.Content}}</div>
+          <p class="blog-post-meta">Added on {{.CreatedAt}} by {{.UserID}} tagged {{.Tag}}</p>
+          <div class="blog">{{raw .Content}}</div>
+          <p class="blog-post-meta">
+            <a href="#">Favourite</a>
+            <a href="{{url "Posts.Edit" .ID}}">Edit</a> |
+            <a href="{{url "Posts.Delete" .ID}}" onclick="return confirm('Are you sure?')">Delete</a>
+          </p>
         </article>
+        {{end}}
       {{else}}
         <p>This post couldn't be fetched!</p>
       {{end}}
