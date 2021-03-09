@@ -23,6 +23,9 @@ GET         /post/:id                                   Posts.Get
 GET         /post/edit/:id                              Posts.Edit
 POST        /post/edit/:id                              Posts.Update
 GET         /post/delete/:id                            Posts.Delete
+POST        /post/comment/:id                           Posts.SaveComment
+GET         /post/comment/delete/:postid/:id            Posts.DeleteComment
+
 
 # Ignore favicon requests
 GET     /favicon.ico                            404

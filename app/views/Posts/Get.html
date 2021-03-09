@@ -13,18 +13,61 @@
       </div>
       {{end}}
       {{if .result.Data.Post}}
-        {{with .result.Data.Post}}
         <article class="blog-post">
-          <h2 class="blog-post-title">{{.Title}}</h2>
-          <p class="blog-post-meta">Added on {{.CreatedAt}} by {{.UserID}} tagged {{.Tag}}</p>
-          <div class="blog">{{raw .Content}}</div>
+          <h2 class="blog-post-title">{{.result.Data.Post.Title}}</h2>
+          <p class="blog-post-meta">Added on {{.result.Data.Post.CreatedAt}} by {{.result.Data.Post.UserID}} tagged {{.Tag}}</p>
+          <div class="blog">{{raw .result.Data.Post.Content}}</div>
           <p class="blog-post-meta">
             <a href="#">Favourite</a>
-            <a href="{{url "Posts.Edit" .ID}}">Edit</a> |
-            <a href="{{url "Posts.Delete" .ID}}" onclick="return confirm('Are you sure?')">Delete</a>
+            <a href="{{url "Posts.Edit" .result.Data.Post.ID}}">Edit</a> |
+            <a href="{{url "Posts.Delete" .result.Data.Post.ID}}" onclick="return confirm('Are you sure?')">Delete</a>
           </p>
         </article>
-        {{end}}
+        <div class="comments" style="margin-left: 50px;">
+          <form action="{{url "Posts.SaveComment" .result.Data.Post.ID}}" method="POST">
+            {{ with $field := field "comment.UserID" . }}
+            <input type="hidden" name="{{$field.Name}}" id="{{$field.Name}}" value="{{$.user.ID}}" />
+            <span class="help-block text-danger">{{$field.Error}}</span>
+            {{end}}
+
+            {{ with $field := field "comment.PostID" . }}
+            <input type="hidden" name="{{$field.Name}}" id="{{$field.Name}}" value="{{$.result.Data.Post.ID}}" />
+            <span class="help-block text-danger">{{$field.Error}}</span>
+            {{end}}
+
+            {{ with $field := field "comment.Content" . }}
+            <div class="form-group row">
+              <label class="col-sm-2 col-form-label" for="{{$field.Name}}">Content</label>
+              <div class="col-sm-10">
+                <textarea name="{{$field.Name}}" id="{{$field.Name}}" rows="5"  class="form-control" placeholder="Write your article (in markdown)">{{if $field.Flash}}{{$field.Flash}}{{else}}{{$field.Value}}{{end}}</textarea>
+                <span class="help-block text-danger">{{$field.Error}}</span>
+              </div>
+            </div>
+            {{ end }}
+
+            <div class="form-group row">
+              <div class="col-sm-10">
+                <button type="submit" class="btn btn-primary">Comment</button>
+              </div>
+            </div>
+          </form>
+
+          <div class="comment-list">
+            {{if .result.Data.Comments}}
+              {{ template "paginate.html" .result.Data.Pagination}}
+              {{range .result.Data.Comments}}
+                <div class="comment border-bottom">
+                  <p class="blog-post-meta">Added on {{.CreatedAt}} by {{.UserID}}</p>
+                  <div class="content">{{.Content}}</div>
+                  <p class="blog-post-meta">
+                    <a href="#">Favourite</a> |
+                    <a href="{{url "Posts.DeleteComment" $.result.Data.Post.ID .ID}}" onclick="return confirm('Are you sure?')">Delete</a>
+                  </p>
+                </div>
+              {{end}}
+            {{end}}
+          </div>
+        </div>
       {{else}}
         <p>This post couldn't be fetched!</p>
       {{end}}

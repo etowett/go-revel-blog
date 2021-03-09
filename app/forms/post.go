@@ -9,6 +9,12 @@ type (
 		Content string `json:"content"`
 		Tag     string `json:"tag"`
 	}
+
+	Comment struct {
+		UserID  int64  `json:"user_id"`
+		PostID  int64  `json:"post_id"`
+		Content string `json:"content"`
+	}
 )
 
 func (post *Post) Validate(v *revel.Validation) {
@@ -43,4 +49,11 @@ func ValidatePostTag(v *revel.Validation, tag string) *revel.ValidationResult {
 	}
 
 	return result
+}
+
+func (form *Comment) Validate(v *revel.Validation) {
+	v.Required(form.UserID).Message("UserID required")
+	v.Required(form.PostID).Message("PostID required")
+	v.Required(form.Content).Message("Content required")
+	return
 }

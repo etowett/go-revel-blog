@@ -89,9 +89,44 @@ func (c *Posts) Get(id int64) revel.Result {
 
 	post.Content = c.MarkdownHTML(post.Content)
 
+	paginationFilter, err := webutils.FilterFromQuery(c.Params)
+	if err != nil {
+		c.Log.Errorf("could not filter from params: %v", err)
+		result = entities.Response{
+			Success: false,
+			Message: "Failed to parse page filters",
+		}
+		return c.Render(result)
+	}
+
+	newComment := models.Comment{}
+	comments, err := newComment.ForPost(c.Request.Context(), db.DB(), id, paginationFilter)
+	if err != nil {
+		c.Log.Errorf("could not get comments for post id %v: %v", id, err)
+		result = entities.Response{
+			Success: false,
+			Message: "Could not get comments",
+		}
+		return c.Render(result)
+	}
+
+	recordsCount, err := newComment.CountForPost(c.Request.Context(), db.DB(), id, paginationFilter)
+	if err != nil {
+		c.Log.Errorf("could not get comment count for post %v: %v", id, err)
+		result = entities.Response{
+			Success: false,
+			Message: "Could not get comments count",
+		}
+		return c.Render(result)
+	}
+
 	result = entities.Response{
 		Success: true,
-		Data:    map[string]interface{}{"Post": post},
+		Data: map[string]interface{}{
+			"Post":       post,
+			"Comments":   comments,
+			"Pagination": models.NewPagination(recordsCount, paginationFilter.Page, paginationFilter.Per),
+		},
 	}
 	return c.Render(result)
 }
@@ -127,6 +162,33 @@ func (c *Posts) Save(post *forms.Post) revel.Result {
 
 	c.Flash.Success("post created - " + newPost.Title)
 	return c.Redirect(routes.Posts.Get(newPost.ID))
+}
+
+func (c *Posts) SaveComment(id int64, comment *forms.Comment) revel.Result {
+	v := c.Validation
+	comment.Validate(v)
+
+	if v.HasErrors() {
+		v.Keep()
+		c.FlashParams()
+		return c.Redirect(routes.Posts.Get(id))
+	}
+
+	newComment := &models.Comment{
+		UserID:  comment.UserID,
+		PostID:  comment.PostID,
+		Content: comment.Content,
+	}
+	err := newComment.Save(c.Request.Context(), db.DB())
+	if err != nil {
+		c.Log.Errorf("could not save comment for post %v: %v", id, err)
+		c.Flash.Error("internal server error -  could not save comment")
+		c.FlashParams()
+		return c.Redirect(routes.Posts.Get(id))
+	}
+
+	c.Flash.Success("Comment added success ")
+	return c.Redirect(routes.Posts.Get(id))
 }
 
 func (c *Posts) Edit(id int64) revel.Result {
@@ -188,4 +250,14 @@ func (c *Posts) Delete(id int64) revel.Result {
 	}
 
 	return c.Redirect(routes.Posts.All())
+}
+
+func (c *Posts) DeleteComment(postid, id int64) revel.Result {
+	newComment := &models.Comment{}
+	_, err := newComment.Delete(c.Request.Context(), db.DB(), id)
+	if err != nil {
+		c.Log.Errorf("error newComment =[%v] delete: %v", id, err)
+	}
+
+	return c.Redirect(routes.Posts.Get(postid))
 }
